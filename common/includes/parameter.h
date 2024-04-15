@@ -53,6 +53,10 @@ typedef struct {
     MD_FLOAT k_dn;
     MD_FLOAT gx, gy, gz;
     MD_FLOAT reflect_x, reflect_y, reflect_z;
+    //MPI implementation
+    int balance;
+    int method;
+    int balance_every;
 } Parameter;
 
 void initParameter(Parameter*);

@@ -26,6 +26,11 @@
 #define NBNXN_INTERACTION_MASK_DIAG_J8_1 0x0080c0e0U
 
 typedef struct {
+    int cluster;
+    int atom;
+} Pair;
+
+typedef struct {
     int every;
     int ncalls;
     int maxneighs;
@@ -34,7 +39,19 @@ typedef struct {
     int half_neigh;
     int* neighbors;
     unsigned int* neighbors_imask;
+    //MPI
+    /*
+    int Nshell;         //# of atoms in listShell(Cluster here cover all possible ghost interactions)
+    int *numNeighShell; //# of neighs for each atom in listShell
+    Pair *neighshell;    //list of neighs for each atom in listShell
+    Pair *listshell;     //Atoms to compute the force
+    */
+    int Nshell;         //# of cluster in listShell(Cluster here cover all possible ghost interactions)
+    int *numNeighShell; //# of neighs for each atom in listShell
+    int *neighshell;    //list of neighs for each atom in listShell
+    int *listshell;     //Atoms to compute the force
 } Neighbor;
+
 
 extern void initNeighbor(Neighbor*, Parameter*);
 extern void setupNeighbor(Parameter*, Atom*);

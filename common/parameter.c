@@ -11,6 +11,7 @@
 #include <atom.h>
 #include <parameter.h>
 #include <util.h>
+#include <mpi.h>
 
 void initParameter(Parameter *param) {
     param->input_file = NULL;
@@ -54,13 +55,17 @@ void initParameter(Parameter *param) {
     param->reflect_x = 0.0;
     param->reflect_y = 0.0;
     param->reflect_z = 0.0;
+    //MPI
+    param->balance = 0;
+    param->method = 0;
+    param->balance_every =param->reneigh_every; 
 }
 
 void readParameter(Parameter *param, const char *filename) {
     FILE *fp = fopen(filename, "r");
     char line[MAXLINE];
     int i;
-
+    
     if(!fp) {
         fprintf(stderr, "Could not open parameter file: %s\n", filename);
         exit(-1);
@@ -72,8 +77,8 @@ void readParameter(Parameter *param, const char *filename) {
         for(i = 0; line[i] != '\0' && line[i] != '#'; i++);
         line[i] = '\0';
 
-        char *tok = strtok(line, " ");
-        char *val = strtok(NULL, " ");
+        char *tok = strtok(line, "\t ");
+        char *val = strtok(NULL, "\t ");
 
         #define PARSE_PARAM(p,f)   if(strncmp(tok, #p, sizeof(#p) / sizeof(#p[0]) - 1) == 0) { param->p = f(val); }
         #define PARSE_STRING(p)    PARSE_PARAM(p, strdup)
@@ -117,15 +122,20 @@ void readParameter(Parameter *param, const char *filename) {
             PARSE_INT(x_out_every);
             PARSE_INT(v_out_every);
             PARSE_INT(half_neigh);
+            PARSE_INT(method);
+            PARSE_INT(balance);
+            PARSE_INT(balance_every);
         }
     }
-
     // Update dtforce
     param->dtforce = 0.5 * param->dt;
 
     // Update sigma6 parameter
     MD_FLOAT s2 = param->sigma * param->sigma;
     param->sigma6 = s2 * s2 * s2;
+    
+    //Update balance parameter, 10 could be change
+    param->balance_every *=param->reneigh_every;
     fclose(fp);
 }
 
@@ -183,4 +193,19 @@ void printParameter(Parameter *param) {
     printf("\tSkin: %e\n", param->skin);
     printf("\tHalf neighbor lists: %d\n", param->half_neigh);
     printf("\tProcessor frequency (GHz): %.4f\n", param->proc_freq);
+
+    // ================ New MPI features =============
+    char str[20]; 
+    strcpy(str, (param->method == 1) ? "Half Shell"  :
+                (param->method == 2) ? "Eight Shell" :
+                (param->method == 3) ? "Half Stencil":                      
+                                       "Full Shell");
+    printf("\tMethod: %s\n", str);
+    strcpy(str, (param->balance == 1) ? "mean RCB"      : 
+                (param->balance == 2) ? "mean Time RCB" :
+                (param->balance == 3) ? "Staggered"     :
+                                        "cartisian");
+    printf("\tPartition: %s\n", str);
+    if(param->balance) 
+        printf("\tRebalancing every (timesteps): %d\n",param->balance_every); 
 }

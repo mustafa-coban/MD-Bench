@@ -20,9 +20,14 @@ typedef struct {
     int ncalls;
     int maxneighs;
     int half_neigh;
+    int half_stencil;
     int *neighbors;
     int *numneigh;
-
+    //MPI
+    int Nshell;         //# of atoms in listShell
+    int *numNeighShell; //# of neighs for each atom in listShell
+    int *neighshell;    //list of neighs for each atom in listShell
+    int *listshell;     //Atoms to compute the force
     // Device data
     DeviceNeighbor d_neighbor;
 } Neighbor;

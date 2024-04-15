@@ -5,6 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 #include <parameter.h>
+#include <box.h>
 
 #ifndef __ATOM_H_
 #define __ATOM_H_
@@ -102,7 +103,7 @@ typedef struct {
 
 typedef struct {
     int Natoms, Nlocal, Nghost, Nmax;
-    int Nclusters, Nclusters_local, Nclusters_ghost, Nclusters_max;
+    int Nclusters, Nclusters_local, Nclusters_ghost, Nclusters_max, NmaxGhost,ncj;
     MD_FLOAT *x, *y, *z;
     MD_FLOAT *vx, *vy, *vz;
     int *border_map;
@@ -112,6 +113,7 @@ typedef struct {
     MD_FLOAT *sigma6;
     MD_FLOAT *cutforcesq;
     MD_FLOAT *cutneighsq;
+    //track the movement of a particle along boundaries
     int *PBCx, *PBCy, *PBCz;
     // Data in cluster format
     MD_FLOAT *cl_x;
@@ -128,6 +130,9 @@ typedef struct {
     unsigned int masks_2xnn_fn[8];
     unsigned int masks_4xn_hn[16];
     unsigned int masks_4xn_fn[16];
+
+    //Info Subdomain
+    Box mybox;   
 } Atom;
 
 extern void initAtom(Atom*);
@@ -139,6 +144,18 @@ extern int readAtom_gro(Atom*, Parameter*);
 extern int readAtom_dmp(Atom*, Parameter*);
 extern void growAtom(Atom*);
 extern void growClusters(Atom*);
+
+int  packGhost(Atom*, int, MD_FLOAT* , int*);
+int  unpackGhost(Atom*, int, MD_FLOAT*);
+int  packExchange(Atom*, int, MD_FLOAT*);
+int  unpackExchange(Atom*, int, MD_FLOAT*);
+void packForward(Atom*, int, int*, MD_FLOAT*, int*); 
+void unpackForward(Atom*, int, int, MD_FLOAT*);
+void packReverse(Atom* , int , int , MD_FLOAT*);
+void unpackReverse(Atom*, int, int*, MD_FLOAT*);
+void pbc(Atom*);
+void copy(Atom*, int, int);
+
 
 #ifdef AOS
 #   define POS_DATA_LAYOUT     "AoS"

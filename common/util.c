@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <util.h>
+#include <math.h>
 
 /* Park/Miller RNG w/out MASKING, so as to be like f90s version */
 #define IA 16807
@@ -86,6 +87,7 @@ int get_cuda_num_threads() {
 
 void readline(char *line, FILE *fp) {
     if(fgets(line, MAXLINE, fp) == NULL) {
+        printf("error %i\n",errno);
         if(errno != 0) {
             perror("readline()");
             exit(-1);

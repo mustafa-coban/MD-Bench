@@ -4,6 +4,8 @@
  * Use of this source code is governed by a LGPL-3.0
  * license that can be found in the LICENSE file.
  */
+#include <math.h>
+
 #ifndef __UTIL_H_
 #define __UTIL_H_
 
@@ -34,6 +36,13 @@
 #else
 #   define PRECISION_STRING     "double"
 #endif
+
+#define BigOrEqual(a,b) (fabs((a)-(b))<1e-9 || (a)>(b))
+#define Equal(a,b) (fabs((a)-(b))<1e-9)
+
+enum {_x=0, _y, _z}; 
+enum {fullShell=0, halfShell, eightShell, halfStencil};
+
 
 extern double myrandom(int*);
 extern void random_reset(int *seed, int ibase, double *coord);

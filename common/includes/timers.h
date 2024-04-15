@@ -9,9 +9,15 @@
 
 typedef enum {
     TOTAL = 0,
-    NEIGH,
     FORCE,
+    NEIGH,
+    FORWARD,
+    REVERSE,
+    UPDATE,
+    BALANCE,
+    SETUP,
+    REST,
     NUMTIMER
-} timertype;
+ } timerComm;
 
 #endif
