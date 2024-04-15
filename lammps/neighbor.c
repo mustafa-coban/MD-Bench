@@ -13,7 +13,6 @@
 #include <atom.h>
 #include <util.h>
 #include <mpi.h>
-#include <sort.h>
 
 #define SMALL 1.0e-6
 #define FACTOR 0.999
